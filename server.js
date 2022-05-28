@@ -3,9 +3,10 @@ const express = require('express');
 const expHbs = require('express-handlebars');
 const session = require('express-session');
 const app = express();
-const port = process.env.PORT || 3001;
-const SequilzeStore = require('connect-session-sequelize')(session.Store); //connects to line 4
+const PORT = process.env.PORT || 3001;
+const SequelizeStore = require('connect-session-sequelize')(session.Store); //connects to line 4
 const sequelize = require('./config/connection');
+const models = require('./models');
 
 // connects log in info to key session for user (kind of like google noticing new device log in)
 const exSess = {
@@ -21,7 +22,7 @@ const exSess = {
 app.use(session(exSess));
 
 const hbs = expHbs.create({
-    helpers
+    // helpers
 });
 
 //boilerplate
@@ -34,6 +35,8 @@ app.use(express.urlencoded({
 }));
 app.use(express.static(path.join(__dirname, 'public')));
 
-sequelize.sync({ force: false }).then(() => {
+models.sequelize.sync({ force: true }).then(() => {
     app.listen(PORT, () => console.log('Now listening'));
-  });
+});
+
+//force recreates database. Dont force true while working, only for big changes then change back to true
